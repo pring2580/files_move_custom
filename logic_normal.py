@@ -29,8 +29,7 @@ from .model import ModelSetting, ModelItem
 import cgitb
 cgitb.enable(format='text')
 
-#synoindex 호출용
-from urlparse import urlparse
+from subprocess import check_output
 
 class LogicNormal(object):
     @staticmethod
@@ -132,11 +131,11 @@ class LogicNormal(object):
                    logger.debug("### file_move_folder file process start ###")
                    logger.debug("move_file_name : %s", file)
                    logger.debug("move_path : %s", directory)
-                   shutil.move(FILE_PATH+file, directory+'/'+file)
+                   LogicNormal.move_file(FILE_PATH+file, directory+'/'+file)
                    logger.debug("### file_move_folder file complete ###")
                 else:
                    #etc 이동
-                   shutil.move(FILE_PATH+file, ETC_PATH+file)
+                   LogicNormal.move_file(FILE_PATH+file, ETC_PATH+file)
              #폴더처리 시작
              elif os.path.isdir(FILE_PATH+file):
                 #폴더내 파일이동 후 삭제할 폴더
@@ -156,11 +155,11 @@ class LogicNormal(object):
                        logger.debug("### file_move_folder folder process start ###")
                        logger.debug("move_file_name : %s", file)
                        logger.debug("move_path : %s", directory)
-                       shutil.move(filepath, directory+'/'+file_name)
+                       LogicNormal.move_file(filepath, directory+'/'+file_name)
                        logger.debug("### file_move_folder folder complete ###")
                    else:
                        #etc 이동
-                       shutil.move(FILE_PATH+file, ETC_PATH+file)
+                       LogicNormal.move_file(FILE_PATH+file, ETC_PATH+file)
                 #while end
                 #폴더 삭제
                 if not delete_path == '':
@@ -239,12 +238,12 @@ class LogicNormal(object):
                    #폴더 없으면 생성
                    if not os.path.isdir(ROOT_PATH+moveDir):
                        os.makedirs(ROOT_PATH+moveDir)
-                   shutil.move(FILE_PATH+file, ROOT_PATH+moveDir+'/'+file)
+                   LogicNormal.move_file(FILE_PATH+file, ROOT_PATH+moveDir+'/'+file)
                 else:
                    #etc로 이동
                    logger.debug("target : %s", FILE_PATH+file)
                    logger.debug("result : %s", ETC_PATH+file)
-                   shutil.move(FILE_PATH+file, ETC_PATH+file)
+                   LogicNormal.move_file(FILE_PATH+file, ETC_PATH+file)
                 logger.debug("### file_move_day file complete ###")
              #폴더처리 시작
              elif os.path.isdir(FILE_PATH+file):
@@ -271,12 +270,12 @@ class LogicNormal(object):
                    if moveDir != '':
                       logger.debug("move_file_name : %s", file_name)
                       logger.debug("move_path : %s", moveDir)
-                      shutil.move(filepath, ROOT_PATH+moveDir+'/'+file_name)
+                      LogicNormal.move_file(filepath, ROOT_PATH+moveDir+'/'+file_name)
                    else:
                       #etc로 이동
                       logger.debug("target : %s", filepath)
                       logger.debug("result : %s", ETC_PATH+file_name)
-                      shutil.move(filepath, ETC_PATH+file_name)
+                      LogicNormal.move_file(filepath, ETC_PATH+file_name)
                    logger.debug("### file_move_day folder complete ###")
                 #while end
                 #폴더 삭제
@@ -310,3 +309,26 @@ class LogicNormal(object):
        aday=datetime.date(year,month,date)
        bday=aday.weekday()
        return r[bday]
+
+    @staticmethod
+    def move_file(source, target):
+        etc_path = ModelSetting.get('etc_path')
+        if etc_path.rfind("/")+1 != len(etc_path):
+            etc_path = etc_path+'/'
+
+        #파일 이동전 가짜릴명 체크
+        file_name = source.split("/")[-1]
+	after_name = file_name
+	encoder = check_output('ffmpeg -i "'+source+'" 2>&1 | grep "encoder"', shell=True)
+        encoder = encoder.split(':')[1]
+        #NEXT 릴인데 가짜릴 인 경우
+        if file_name.upper().find("-NEXT") > -1 and encoder.find('MH ENCODER') < 0:
+            logger.debug("bug release file : %s", file_name)
+            #파일명 변환하여 이동
+            after_name = file_name.replace("-NEXT", "-FAKE", 1).replace("-next", "-fake", 1)
+            logger.debug("before name : %s, after name : %s", file_name, after_name)
+	    #파일 이동
+            shutil.move(source, etc_path+after_name)
+        else:
+            #파일 이동
+            shutil.move(source, target)
