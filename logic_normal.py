@@ -101,7 +101,7 @@ class LogicNormal(object):
        exclude = ['@eaDir']
        #이동할 파일 조회(파일, 폴더내 파일)
        fileList = os.listdir(FILE_PATH)
-           
+
        for file in fileList:
           mvBool = True
           for ex in exclude:
@@ -151,6 +151,7 @@ class LogicNormal(object):
                    #이름에 해당하는 폴더 있으면 이동
                    fileName = file_name.split('.')[0]
                    #logger.debug("fileDate : %s", fileDate)
+                   logger.debug("ROOT_PATH+fileName : %s", ROOT_PATH+fileName)
                    if os.path.isdir(ROOT_PATH+fileName):
                        logger.debug("### file_move_folder folder process start ###")
                        logger.debug("move_file_name : %s", file)
@@ -163,7 +164,8 @@ class LogicNormal(object):
                 #while end
                 #폴더 삭제
                 if not delete_path == '':
-                   LogicNormal.remove_dir(delete_path)
+                    logger.debug("delete_path : %s", delete_path)
+                    #LogicNormal.remove_dir(delete_path)
              #폴더 처리 완료
        logger.debug("=========== file_move_folder() END ===========")
 
