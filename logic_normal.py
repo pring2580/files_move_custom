@@ -143,7 +143,8 @@ class LogicNormal(object):
                 logger.debug("delete_path : %s", delete_path)
                 #while start
                 while True:
-                   filepath = LogicNormal.get_lastfile(file)
+                   filepath = LogicNormal.get_lastfile(FILE_PATH+file)
+                   logger.debug("last_file_path : %s", filepath)
                    if filepath == '':
                       break;
                    file_info = os.path.split(filepath)
@@ -165,7 +166,7 @@ class LogicNormal(object):
                 #폴더 삭제
                 if not delete_path == '':
                     logger.debug("delete_path : %s", delete_path)
-                    #LogicNormal.remove_dir(delete_path)
+                    LogicNormal.remove_dir(delete_path)
              #폴더 처리 완료
        logger.debug("=========== file_move_folder() END ===========")
 
@@ -314,22 +315,28 @@ class LogicNormal(object):
 
     @staticmethod
     def move_file(source, target):
+        logger.debug("source : %s, target : %s", source, target)
         etc_path = ModelSetting.get('etc_path')
         if etc_path.rfind("/")+1 != len(etc_path):
             etc_path = etc_path+'/'
 
         #파일 이동전 가짜릴명 체크
         file_name = source.split("/")[-1]
-	after_name = file_name
-	encoder = check_output('ffmpeg -i "'+source+'" 2>&1 | grep "encoder"', shell=True)
-        encoder = encoder.split(':')[1]
+        after_name = file_name
+        
+        #대상이 파일인 경우만 릴 검사
+        encoder = ''
+        if os.path.isfile(source):
+            encoder = check_output('ffmpeg -i "'+source+'" 2>&1 | grep "encoder"', shell=True)
+            encoder = encoder.split(':')[1]
+        
         #NEXT 릴인데 가짜릴 인 경우
         if file_name.upper().find("-NEXT") > -1 and encoder.find('MH ENCODER') < 0:
             logger.debug("bug release file : %s", file_name)
             #파일명 변환하여 이동
             after_name = file_name.replace("-NEXT", "-FAKE", 1).replace("-next", "-fake", 1)
             logger.debug("before name : %s, after name : %s", file_name, after_name)
-	    #파일 이동
+	        #파일 이동
             shutil.move(source, etc_path+after_name)
         else:
             #파일 이동
