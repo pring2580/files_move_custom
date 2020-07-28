@@ -36,7 +36,7 @@ class LogicNormal(object):
     @celery.task
     def scheduler_function():
         try:
-            #logger.debug("파일정리 시작!")
+            logger.debug("파일정리 시작!")
             source_path = ModelSetting.get('source_path')
             download_path = ModelSetting.get('download_path')
             etc_path = ModelSetting.get('etc_path')
@@ -329,15 +329,16 @@ class LogicNormal(object):
         if os.path.isfile(source):
             encoder = check_output('ffmpeg -i "'+source+'" 2>&1 | grep "encoder"', shell=True)
             encoder = encoder.split(':')[1]
-        
-        #NEXT 릴인데 가짜릴 인 경우
-        if file_name.upper().find("-NEXT") > -1 and encoder.find('MH ENCODER') < 0:
-            logger.debug("bug release file : %s", file_name)
-            #파일명 변환하여 이동
-            after_name = file_name.replace("-NEXT", "-FAKE", 1).replace("-next", "-fake", 1)
-            logger.debug("before name : %s, after name : %s", file_name, after_name)
-	        #파일 이동
-            shutil.move(source, etc_path+after_name)
-        else:
-            #파일 이동
-            shutil.move(source, target)
+            #NEXT 릴인데 가짜릴 인 경우
+            if file_name.upper().find("-NEXT") > -1 and encoder.find('MH ENCODER') < 0:
+                logger.debug("release name NEXT, but encoder is not MH ENCODER")
+                logger.debug("bug release file : %s", file_name)
+                logger.debug("encoder : %s", encoder)
+                #파일명 변환하여 이동
+                after_name = file_name.replace("-NEXT", "-FAKE", 1).replace("-next", "-fake", 1)
+                logger.debug("before name : %s, after name : %s", file_name, after_name)
+                #파일 이동
+                shutil.move(source, etc_path+after_name)
+            else:
+                #파일 이동
+                shutil.move(source, target)
