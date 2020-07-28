@@ -149,8 +149,13 @@ class LogicNormal(object):
                       break;
                    file_info = os.path.split(filepath)
                    file_name = file_info[1]
+                   #폴더명과 파일명 다른경우 중지(광고URL)
+                   logger.debug("file_name : %s, file : %s", file_name, file)
+                   if file_name != file:
+                       break;
                    #이름에 해당하는 폴더 있으면 이동
                    fileName = file_name.split('.')[0]
+
                    #logger.debug("fileDate : %s", fileDate)
                    logger.debug("ROOT_PATH+fileName : %s", ROOT_PATH+fileName)
                    if os.path.isdir(ROOT_PATH+fileName):
