@@ -32,6 +32,7 @@ class Logic(object):
 	    'download_path' : '',
 	    'etc_path' : '',
 	    'move_type' : '',
+        'check_release' : 'False',
         'fake_process' : 'False',
         'schedulerInterval' : ''
     }

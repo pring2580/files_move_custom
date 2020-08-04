@@ -41,6 +41,8 @@ from bot_downloader_ktv.model import ModelSetting as KtvModelSetting, ModelBotDo
 from subprocess import check_output
 
 class LogicNormal(object):
+    check_release = None
+
     @staticmethod
     @celery.task
     def scheduler_function():
@@ -50,6 +52,8 @@ class LogicNormal(object):
             download_path = ModelSetting.get('download_path')
             etc_path = ModelSetting.get('etc_path')
             move_type = ModelSetting.get('move_type')
+            check_release = ModelSetting.get('check_release')
+            LogicNormal.check_release = check_release
             fake_process = ModelSetting.get('fake_process')
             #logger.debug("source_path >> %s", source_path)
             #logger.debug("download_path >> %s", download_path)
@@ -347,8 +351,8 @@ class LogicNormal(object):
         if os.path.isfile(source):
             encoder = check_output('ffmpeg -i "'+source+'" 2>&1 | grep "encoder"', shell=True)
             encoder = encoder.split(':')[1]
-            #NEXT 릴인데 가짜릴 인 경우
-            if file_name.upper().find("-NEXT") > -1 and encoder.find('MH ENCODER') < 0:
+            #릴재다운로드 + NEXT 릴인데 가짜릴 인 경우
+            if LogicNormal.check_release == 'True' and file_name.upper().find("-NEXT") > -1 and encoder.find('MH ENCODER') < 0:
                 logger.debug("release name NEXT, but encoder is not MH ENCODER")
                 logger.debug("bug release file : %s", file_name)
                 logger.debug("encoder : %s", encoder)
