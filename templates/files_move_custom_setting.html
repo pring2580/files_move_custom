@@ -9,7 +9,8 @@
   {{ macros.setting_input_text('source_path', '라이브러리경로', value=arg['source_path'], desc=['라이브러리경로', 'sjva']) }}
   {{ macros.setting_input_text('download_path', '다운로드 경로', value=arg['download_path'], desc=['봇 다운로드 경로(다운로드 클라이언트 경로)', 'sjva/download']) }}
   {{ macros.setting_input_text('etc_path', '예외 처리 폴더', value=arg['etc_path'], desc=['파일 이동 중 예외처리 되는 경로', 'sjva/etc']) }}
-  {{ macros.setting_input_text('move_type', '파일정리유형(1:폴더별, 2:날짜별)', value=arg['move_type'], placeholder='1', desc=['파일정리할 방법 선택', '1:폴더별, 2:날짜별']) }}
+  {{ macros.setting_input_text('move_type', '파일정리유형(1:폴더별, 2:날짜별)', value=arg['move_type'], placeholder='', desc=['파일정리할 방법 선택', '1:폴더별, 2:날짜별']) }}
+  {{ macros.setting_checkbox('fake_process', '가짜릴 재 다운로드', value=arg['fake_process'], desc='On:예외처리폴더에 있는 가짜릴 재검색, Off:재검색하지 않음') }}
   {{ macros.setting_button([['global_setting_save_btn', '저장']]) }}
   </form>
   {{ macros.m_hr() }}

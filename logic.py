@@ -27,11 +27,12 @@ from .logic_normal import LogicNormal
 class Logic(object):
     db_default = {
         'db_version' : '1',
-	'auto_start' : 'False',
-	'source_path' : '',
-	'download_path' : '',
-	'etc_path' : '',
-	'move_type' : '',
+	    'auto_start' : 'False',
+	    'source_path' : '',
+	    'download_path' : '',
+	    'etc_path' : '',
+	    'move_type' : '',
+        'fake_process' : 'False',
         'schedulerInterval' : ''
     }
 
@@ -76,7 +77,7 @@ class Logic(object):
     def scheduler_start():
         try:
             logger.debug('%s scheduler_start' % package_name)
-            job = Job(package_name, package_name, ModelSetting.get('schedulerInterval'), Logic.scheduler_function, u"파일정리_날짜별", False)
+            job = Job(package_name, package_name, ModelSetting.get('schedulerInterval'), Logic.scheduler_function, u"파일정리_폴더별_날짜별", False)
             scheduler.add_job_instance(job)
         except Exception as e:
             logger.error('Exception:%s', e)
