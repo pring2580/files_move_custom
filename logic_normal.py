@@ -349,22 +349,35 @@ class LogicNormal(object):
         #대상이 파일인 경우만 릴 검사
         encoder = ''
         if os.path.isfile(source):
-            encoder = check_output('ffmpeg -i "'+source+'" 2>&1 | grep "encoder"', shell=True)
-            encoder = encoder.split(':')[1]
-            #릴재다운로드 + NEXT 릴인데 가짜릴 인 경우
-            if LogicNormal.check_release == 'True' and file_name.upper().find("-NEXT") > -1 and encoder.find('MH ENCODER') < 0:
-                logger.debug("release name NEXT, but encoder is not MH ENCODER")
-                logger.debug("bug release file : %s", file_name)
-                logger.debug("encoder : %s", encoder)
+            try:
+                encoder = check_output('ffmpeg -i "'+source+'" 2>&1 | grep "encoder"', shell=True)
+                encoder = encoder.split(':')[1]
+                #릴재다운로드 + NEXT 릴인데 가짜릴 인 경우
+                if LogicNormal.check_release == 'True' and file_name.upper().find("-NEXT") > -1 and encoder.find('MH ENCODER') < 0:
+                    logger.debug("release name NEXT, but encoder is not MH ENCODER")
+                    logger.debug("bug release file : %s", file_name)
+                    logger.debug("encoder : %s", encoder)
+                    #파일명 변환하여 이동
+                    after_name = file_name.replace("-NEXT", "-FAKE", 1).replace("-next", "-fake", 1)
+                    logger.debug("before name : %s, after name : %s", file_name, after_name)
+                    #파일 이동
+                    shutil.move(source, etc_path+after_name)
+                else:
+                    #파일 이동
+                    shutil.move(source, target)
+            except Exception as e:
+                #에러 발생 = 인코딩 정보 없는 경우
+                logger.error('Exception:%s', e)
+                logger.error(traceback.format_exc())
                 #파일명 변환하여 이동
-                after_name = file_name.replace("-NEXT", "-FAKE", 1).replace("-next", "-fake", 1)
+                after_name = file_name.replace("-NEXT", "-NONE", 1).replace("-next", "-none", 1)
                 logger.debug("before name : %s, after name : %s", file_name, after_name)
+                #프로그램명으로 이동
+                source_path = ModelSetting.get('source_path')
+                folder_name = after_name.split('.')[0]
+                directory = os.path.join(source_path, folder_name)
                 #파일 이동
-                shutil.move(source, etc_path+after_name)
-            else:
-                #파일 이동
-                shutil.move(source, target)
-
+                shutil.move(source, os.path.join(directory, after_name))
 
     @staticmethod
     def init_torrent():
