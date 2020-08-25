@@ -169,21 +169,25 @@ class LogicNormal(object):
                         file_name = file_info[1]
                         #폴더명과 파일명 다른경우 중지(광고URL)
                         logger.debug("file_name : %s, file : %s", file_name, file)
+                        
+                        #광고 파일이면 삭제(파일명에 폴더명 없으면 광고로 판단)
                         if file_name.upper().find(file.upper()) < 0:
-                            break
-                        #이름에 해당하는 폴더 있으면 이동
-                        fileName = file_name.split('.')[0]
-                        #logger.debug("fileDate : %s", fileDate)
-                        logger.debug("ROOT_PATH+fileName : %s", ROOT_PATH+fileName)
-                        if os.path.isdir(ROOT_PATH+fileName):
-                            logger.debug("### file_move_folder folder process start ###")
-                            logger.debug("move_file_name : %s", file)
-                            logger.debug("move_path : %s", directory)
-                            LogicNormal.move_file(filepath, directory+'/'+file_name)
-                            logger.debug("### file_move_folder folder complete ###")
+                            logger.debug("another fileName and folderName!! remove_path : %s", filepath)
+                            os.remove(filepath)
                         else:
-                            #etc 이동
-                            LogicNormal.move_file(FILE_PATH+file, ETC_PATH+file)
+                            #이름에 해당하는 폴더 있으면 이동
+                            fileName = file_name.split('.')[0]
+                            #logger.debug("fileDate : %s", fileDate)
+                            logger.debug("ROOT_PATH+fileName : %s", ROOT_PATH+fileName)
+                            if os.path.isdir(ROOT_PATH+fileName):
+                                logger.debug("### file_move_folder folder process start ###")
+                                logger.debug("move_file_name : %s", file)
+                                logger.debug("move_path : %s", directory)
+                                LogicNormal.move_file(filepath, directory+'/'+file_name)
+                                logger.debug("### file_move_folder folder complete ###")
+                            else:
+                                #etc 이동
+                                LogicNormal.move_file(FILE_PATH+file, ETC_PATH+file)
                     #while end
                     #폴더 삭제
                     if not delete_path == '':
