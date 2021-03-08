@@ -15,7 +15,6 @@ from framework import app, db, scheduler, path_data, socketio, check_api
 from framework.util import Util
 from system.model import ModelSetting as SystemModelSetting
 from system.logic import SystemLogic
-from framework.common.torrent.process import TorrentProcess
 
 # 패키지
 # 로그
@@ -24,7 +23,6 @@ logger = get_logger(package_name)
 
 from .model import ModelSetting, ModelItem
 from .logic import Logic
-from .logic_normal import LogicNormal
 
 #########################################################
 
@@ -34,19 +32,19 @@ from .logic_normal import LogicNormal
 blueprint = Blueprint(package_name, package_name, url_prefix='/%s' %  package_name, template_folder=os.path.join(os.path.dirname(__file__), 'templates'))
 
 menu = {
-    'main' : [package_name, '파일정리(폴더/날짜별)'],
+    'main' : [package_name, u'파일정리(폴더/날짜별)'],
     'sub' : [
-        ['setting', '설정'], ['log', '로그']
+        ['setting', u'설정'], ['log', u'로그']
     ],
     'category' : 'fileprocess'
 }
 
 plugin_info = {
-    'version' : '0.1',
+    'version' : '1.0',
     'name' : 'files_move_custom',
     'category_name' : 'fileprocess',
     'developer' : 'pring',
-    'description' : '파일정리(폴더/날짜별)',
+    'description' : u'파일정리(폴더/날짜별)',
     'home' : 'https://github.com/pring2580/files_move_custom',
     'more' : '',
 }
